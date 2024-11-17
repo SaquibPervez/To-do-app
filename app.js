@@ -1,17 +1,25 @@
 var input_item = document.getElementById("input_item")
 var parent = document.getElementById("parent")
 
-function edit(element){
-
-    var editprompt = prompt("Enter edit value..")
-   element.parentNode.parentNode.firstChild.textContent = editprompt;
-
+function edit(element){ 
+    var indexnumber  = element.id;
+    console.log(indexnumber);
+    var notesArr = JSON.parse(localStorage.getItem("notes"))
+    var editprompt = prompt("Enter Edit Value...!")
+    notesArr.splice(indexnumber,1, editprompt);
+    localStorage.setItem("notes",JSON.stringify(notesArr));
+    renderUI();
 }
 
 function deletes(element){
-    element.parentNode.parentNode.remove();
+    var notesArr = JSON.parse(localStorage.getItem("notes"))
+    var index = element.id;
+    notesArr.splice(index,1);
+    localStorage.setItem("notes", JSON.stringify(notesArr));
+    renderUI();
 }
 
+var notesArr =[]
 function add_item(){
     // console.log("additem", input_item.value)
 
@@ -19,16 +27,34 @@ function add_item(){
         alert("Enter a correct item...!")
         return;
     }
+    var getnodes = localStorage.getItem("notes")
+    console.log("getnodes", getnodes)
 
- var UI = `<div class="alert alert-primary d-flex justify-content-between" role="alert">
- ${input_item.value}
+    if(getnodes == null){
+        var temparr = [input_item.value]
+        localStorage.setItem("notes", JSON.stringify(temparr))
+    }else{
+        var temparr = JSON.parse(getnodes);
+        temparr.unshift(input_item.value);
+        localStorage.setItem("notes", JSON.stringify(temparr));
+    }
+    renderUI();
+    input_item.value = "";
+}
+function renderUI(){
+    var notesArr = JSON.parse(localStorage.getItem("notes"))
+
+    var UI = ""
+
+for(var i = 0; i<notesArr.length; i++){
+ UI += `<div class="alert alert-primary d-flex justify-content-between" role="alert">
+ ${notesArr[i]}
 <div>
-    <i onclick = "edit(this)" class="fa-solid fa-pen-to-square"></i>
-    <i onclick = "deletes(this)" class="fa-solid fa-trash"></i>
+    <i onclick = "edit(this)" id=${i} class="fa-solid fa-pen-to-square"></i>
+    <i onclick = "deletes(this)" id=${i} class="fa-solid fa-trash"></i>
 </div>
-</div>`
-
+</div>`;
+}
 // console.log("UI", UI);
-  parent.innerHTML += UI;
-  input_item.value = "   ";
+  parent.innerHTML = UI;
 }
